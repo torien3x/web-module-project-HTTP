@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route,Navigate, redirect } from 'react-router-dom';
+
 import MovieList from './components/MovieList';
 import Movie from './components/Movie';
 
@@ -9,6 +10,7 @@ import MovieHeader from './components/MovieHeader';
 import FavoriteMovieList from './components/FavoriteMovieList';
 
 import axios from 'axios';
+import AddMovieForm from "./components/AddMovieForm";
 
 const App = (props) => {
   const [movies, setMovies] = useState([]);
@@ -25,6 +27,7 @@ const App = (props) => {
   }, []);
 
   const deleteMovie = (id) => {
+    setMovies(movies.filter(item => (item.id !== Number(id))));
     // Make a DELETE request using Axios
     // On success update the movies list in state
     // and navigate the user to /movies
@@ -46,15 +49,26 @@ const App = (props) => {
         <div className="row ">
           <FavoriteMovieList favoriteMovies={favoriteMovies} />
 
-          <Routes>
-            <Route path="movies/edit/:id" />
+          <Router>
+            <Route path="movies/edit/:id">
+              <EditMovieForm setMovies={setMovies}/>
+            </Route>  
 
-            <Route path="movies/:id" />
+            <Route path="/movies/add">
+              <AddMovieForm setMovies={setMovies}/>
+            </Route>
+            <Route path="movies/:id">
+              <Movie deleteMovie={deleteMovie}/>
+            </Route>  
 
-            <Route path="movies" element={<MovieList movies={movies} />} />
+            <Route path="movies">
+              <MovieList movies={movies}/>
+            </Route>
 
-            <Route path="/" element={<Navigate to="/movies" />} />
-          </Routes>
+            <Route path="/">
+              <redirect to="/movies" />
+            </Route>
+          </Router>
         </div>
       </div>
     </div>
